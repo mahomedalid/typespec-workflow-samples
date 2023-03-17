@@ -1,0 +1,30 @@
+import "@cadl-lang/rest";
+import "@cadl-lang/openapi";
+
+using Cadl.Http;
+using OpenAPI;
+
+@service({
+  title: "TodoApi Service",
+  version: "2023-02-01",
+})
+@doc("This is a sample server TodoApi server.")
+
+namespace TodoApi;
+
+@summary("WeatherForecast model")
+model WeatherForecast
+{
+    Date: plainDate;
+
+    TemperatureC: int32;
+
+    TemperatureF: int32;
+
+    Summary?: string;
+}
+
+interface WeatherForecastController {
+  @route("/WeatherForecast/GetWeatherForecast")
+  @get GetWeatherForecast(): WeatherForecast[];
+}
