@@ -1,0 +1,60 @@
+# Build Results
+bin/
+obj/
+
+# Visual Studio 2017
+.vs/
+
+# NuGet Packages
+**/packages/*
+!**/packages/repositories.config
+
+# dotnet user-secrets
+.aspnet/secrets/
+
+# Runtime Store
+runtime.store/
+
+# Rider
+.idea/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+
+# User-specific files
+*.user
+*.suo
+*.sln.docstates
+
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Unnecessary files
+*.log
+
+# Visual Studio 2015
+.vs/
+
+# Visual Studio .Net Cache
+*.dll
+*.exe
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NPM
+node_modules/
+
+# OSX
+.DS_Store
+
+# JetBrains Rider
+.idea/
+
+# Windows
+Thumbs.db
