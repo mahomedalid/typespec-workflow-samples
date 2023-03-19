@@ -14,13 +14,13 @@ on:
 env:
   ## These variables are shared across workflows, please configure in GitHub variables
   # Project code base dir, usually where the solution file resides. Example: ./src
-  PROJECT_BASE_DIR: ${{ vars.PROJECT_BASE_DIR }} | "src/"
+  PROJECT_BASE_DIR:  "src/"
   # Api project dir. Example: IST
-  API_PROJECT_DIR: ${{ vars.API_PROJECT_DIR }} | "TodoApi"
+  API_PROJECT_DIR: "TodoApi"
   # Path to the Cadl dir. Example: ./cadl
-  TSP_DIRNAME: ${{ vars.TSP_DIRNAME }} | "design/api-contracts/todo"
+  TSP_DIRNAME: "design/api-contracts/todo"
   # Cadl filename used for comparison. Example: main.cadl
-  TSP_FILENAME: ${{ vars.TSP_FILENAME }} | "main.tsp"
+  TSP_FILENAME: "main.tsp"
   
   # nswag generated openapi filename, used only for comparison inside the workflow
   CODE_OPENAPI_FILENAME: openapi.code.json
