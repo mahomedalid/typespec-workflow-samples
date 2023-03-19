@@ -14,24 +14,24 @@ on:
 env:
   ## These variables are shared across workflows, please configure in GitHub variables
   # Project code base dir, usually where the solution file resides. Example: ./src
-  PROJECT_BASE_DIR: ${{ vars.PROJECT_BASE_DIR }}
+  PROJECT_BASE_DIR: ${{ vars.PROJECT_BASE_DIR }} || "src/"
   # Api project dir. Example: IST
-  API_PROJECT_DIR: ${{ vars.API_PROJECT_DIR }}
+  API_PROJECT_DIR: ${{ vars.API_PROJECT_DIR }} || "TodoApi"
   # Path to the Cadl dir. Example: ./cadl
-  CADL_DIRNAME: ${{ vars.CADL_DIRNAME }}
+  TSP_DIRNAME: ${{ vars.TSP_DIRNAME }} || "design/api-contracts/todo"
   # Cadl filename used for comparison. Example: main.cadl
-  CADL_FILENAME: ${{ vars.CADL_FILENAME }}
-  # API assembly name. Example: API.dll
-  API_ASSEMBLY_NAME: ${{ vars.API_ASSEMBLY_NAME }}
+  TSP_FILENAME: ${{ vars.TSP_FILENAME }} || "main.tsp"
   
   # nswag generated openapi filename, used only for comparison inside the workflow
   CODE_OPENAPI_FILENAME: openapi.code.json
   # cadl generated openapi filename, used only for comparison inside the workflow
-  CADL_OPENAPI_FILENAME: openapi.base.json
+  TSP_OPENAPI_FILENAME: openapi.base.json
   # temporary directory used only for comparison inside the workflow
   OPENAPI_OUTPUT_DIRNAME: openapi-output
   # temporary directory for the api build
   DOTNET_ASSEMBLY_DIRNAME: build
+
+  SWAGGER_URL: "http://localhost:5147/swagger/v1/swagger.json"
 
 jobs:
   contract-verification:
@@ -48,7 +48,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - run: npm ci
-        working-directory: ${{ env.CADL_DIRNAME }}
+        working-directory: ${{ env.TSP_DIRNAME }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v2
@@ -59,25 +59,25 @@ jobs:
         working-directory: ${{ env.PROJECT_BASE_DIR }}
         run: dotnet restore
 
-      - name: Build
+      - name: Run Api
         working-directory: ${{ env.PROJECT_BASE_DIR }}/${{ env.API_PROJECT_DIR }}
-        run: dotnet build --no-restore -o ${DOTNET_ASSEMBLY_DIRNAME}
+        run: dotnet run
 
       - name: Generating API Contract from CADL
-        working-directory: ${{ env.CADL_DIRNAME }}
-        run: npx cadl compile ${{ env.CADL_FILENAME }} --output-dir ../../${{ env.OPENAPI_OUTPUT_DIRNAME }} --option "@cadl-lang/openapi3.output-file=${{ env.CADL_OPENAPI_FILENAME }}"
+        working-directory: ${{ env.TSP_DIRNAME }}
+        run: npx tsp compile ${{ env.TSP_FILENAME }} --output-dir ../../${{ env.OPENAPI_OUTPUT_DIRNAME }} --option "@typespec/openapi3.output-file=${{ env.TSP_OPENAPI_FILENAME }}"
 
-      - name: Generating API Contract from code
-        working-directory: ${{ env.PROJECT_BASE_DIR }}/${{ env.API_PROJECT_DIR }}/${{ env.DOTNET_ASSEMBLY_DIRNAME }}
-        run: npx nswag aspnetcore2openapi /assembly:./${{ env.API_ASSEMBLY_NAME }} /output:../../${{ env.OPENAPI_OUTPUT_DIRNAME }}/${{ env.CODE_OPENAPI_FILENAME }}
+      - name: Retrieving API Contract from implementation
+        working-directory: ${{ env.OPENAPI_OUTPUT_DIRNAME }}
+        run: curl ${{ env.SWAGGER_URL }} -o ${{ env.CODE_OPENAPI_FILENAME }}
 
       - name: Comparing API Contracts
         working-directory: ${{ env.OPENAPI_OUTPUT_DIRNAME }}
         run: |
-          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -breaking-only -format text -base /data/${{ env.CADL_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.breaking.txt
-          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -format text -base /data/${{ env.CADL_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.detailed.txt
-          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -summary -format text -base /data/${{ env.CADL_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.summary.txt
-          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -summary -format yaml -base /data/${{ env.CADL_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.detailed.json
+          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -breaking-only -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.breaking.txt
+          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.detailed.txt
+          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -summary -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.summary.txt
+          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -summary -format yaml -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.detailed.json
 
       - name: Archive API contract differences
         uses: actions/upload-artifact@v3
