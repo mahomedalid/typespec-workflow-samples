@@ -74,6 +74,7 @@ jobs:
       - name: Comparing API Contracts
         working-directory: ${{ env.TSP_DIRNAME }}/${{ env.OPENAPI_OUTPUT_DIRNAME }}
         run: |
+          docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }}
           docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -breaking-only -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.breaking.txt
           docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.detailed.txt
           docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -summary -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }} > diff.summary.txt
