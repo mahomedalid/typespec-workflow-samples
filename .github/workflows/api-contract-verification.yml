@@ -61,7 +61,7 @@ jobs:
 
       - name: Run Api
         working-directory: ${{ env.PROJECT_BASE_DIR }}/${{ env.API_PROJECT_DIR }}
-        run: dotnet run
+        run: dotnet run &
 
       - name: Generating API Contract from CADL
         working-directory: ${{ env.TSP_DIRNAME }}
