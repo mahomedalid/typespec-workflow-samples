@@ -65,10 +65,10 @@ jobs:
 
       - name: Generating API Contract from CADL
         working-directory: ${{ env.TSP_DIRNAME }}
-        run: npx tsp compile ${{ env.TSP_FILENAME }} --output-dir ../../${{ env.OPENAPI_OUTPUT_DIRNAME }} --option "@typespec/openapi3.output-file=${{ env.TSP_OPENAPI_FILENAME }}"
+        run: npx tsp compile ${{ env.TSP_FILENAME }} --output-dir ${{ env.OPENAPI_OUTPUT_DIRNAME }} --option "@typespec/openapi3.output-file=${{ env.TSP_OPENAPI_FILENAME }}"
 
       - name: Retrieving API Contract from implementation
-        working-directory: ${{ env.OPENAPI_OUTPUT_DIRNAME }}
+        working-directory: ${{ env.TSP_DIRNAME }}/${{ env.OPENAPI_OUTPUT_DIRNAME }}
         run: curl ${{ env.SWAGGER_URL }} -o ${{ env.CODE_OPENAPI_FILENAME }}
 
       - name: Comparing API Contracts
