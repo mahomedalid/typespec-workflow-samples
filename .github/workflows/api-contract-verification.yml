@@ -72,6 +72,15 @@ jobs:
         run: curl ${{ env.SWAGGER_URL }} -o ${{ env.CODE_OPENAPI_FILENAME }}
 
       - name: Comparing API Contracts
+        uses: Tufin/oasdiff-action@v2
+        with:
+          base: ${{ env.TSP_DIRNAME }}/${{ env.OPENAPI_OUTPUT_DIRNAME }}/${{ env.TSP_OPENAPI_FILENAME }}
+          revision: ${{ env.TSP_DIRNAME }}/${{ env.OPENAPI_OUTPUT_DIRNAME }}/${{ env.CODE_OPENAPI_FILENAME }}
+          format: 'text'
+          breaking-only: true
+          fail-on-diff: true
+
+      - name: Genering diff files
         working-directory: ${{ env.TSP_DIRNAME }}/${{ env.OPENAPI_OUTPUT_DIRNAME }}
         run: |
           docker run --rm -t -v $(pwd):/data:ro tufin/oasdiff -format text -base /data/${{ env.TSP_OPENAPI_FILENAME }} -revision /data/${{ env.CODE_OPENAPI_FILENAME }}
