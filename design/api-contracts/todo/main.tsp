@@ -56,5 +56,5 @@ enum DayOfWeek
 
 interface WeatherForecastController {
     @route("/WeatherForecast")
-    @get GetWeatherForecast(): WeatherForecast[];
+    @get GetWeatherForecast(): WeatherForecast;
 }
