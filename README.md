@@ -9,7 +9,7 @@ TypeSpec is a tool for generating OpenAPI.json specifications from the CADL form
 
 * [design/api-contracts](/design/api-contracts): Example API TypeSpec contracts used in the workflows.
 * [src](/src): Implementations (code) of APIs.
-* [.github/workflows]: GitHub Workflow samples.
+* [.github/workflows](.github/workflows): GitHub Workflow samples.
 
 #### Workflows
 
